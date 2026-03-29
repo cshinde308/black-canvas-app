@@ -35,6 +35,12 @@ button {
     border-radius: 8px !important;
 }
 
+/* Black canvas vertical container */
+.canvas-container {
+    min-height: 85vh;
+    padding: 10px;
+}
+
 /* Floating Action Button (Button B) */
 .fab-button {
     position: fixed;
@@ -74,42 +80,55 @@ if "screen" not in st.session_state:
 def login_screen():
     st.markdown("<h2 style='text-align:center;'>Login</h2>", unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    with st.container():  # vertical layout
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
 
-    with col2:
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-
-        if st.button("Login"):
-            if username == "admin" and password == "admin":
-                st.session_state.logged_in = True
-                st.session_state.screen = "canvas"
-                st.rerun()
-            else:
-                st.error("Invalid credentials")
+            if st.button("Login"):
+                if username == "admin" and password == "admin":
+                    st.session_state.logged_in = True
+                    st.session_state.screen = "canvas"
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials")
 
 # -----------------------------
 # Main Canvas Screen
 # -----------------------------
 def canvas_screen():
-    # Top-left menu bubble (A)
-    col1, col2, col3 = st.columns([1, 8, 1])
-    with col1:
-        if st.button("☰"):
-            st.session_state.screen = "menu"
-            st.rerun()
 
-    # Floating + Button (B)
-    if st.button("+", key="fab", help="Add", use_container_width=False):
+    # -------- Black Canvas (Vertical Container) --------
+    st.markdown("<div class='canvas-container'>", unsafe_allow_html=True)
+    with st.container():
+
+        # ---- Top Bar (Horizontal inside canvas) ----
+        top_left, top_mid, top_right = st.columns([1, 8, 1])
+
+        with top_left:
+            if st.button("☰"):
+                st.session_state.screen = "menu"
+                st.rerun()
+
+        # ---- Canvas Content Area (Vertical space) ----
+        with st.container():
+            st.markdown("<br><br>", unsafe_allow_html=True)
+            # Future widgets / charts / content go here
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---- Floating Action Button (outside layout flow) ----
+    if st.button("+", key="fab"):
         st.session_state.screen = "plus"
         st.rerun()
 
-    # Apply FAB style to the last button
+    # Apply FAB style
     st.markdown("""
     <script>
-    const buttons = window.parent.document.querySelectorAll('button');
-    const fab = buttons[buttons.length - 1];
-    fab.classList.add('fab-button');
+        const buttons = window.parent.document.querySelectorAll('button');
+        const fab = buttons[buttons.length - 1];
+        fab.classList.add('fab-button');
     </script>
     """, unsafe_allow_html=True)
 
@@ -117,21 +136,23 @@ def canvas_screen():
 # Menu Screen
 # -----------------------------
 def menu_screen():
-    st.markdown("<h3>Menu Screen</h3>", unsafe_allow_html=True)
+    with st.container():  # vertical screen container
+        st.markdown("<h3>Menu Screen</h3>", unsafe_allow_html=True)
 
-    if st.button("Back"):
-        st.session_state.screen = "canvas"
-        st.rerun()
+        if st.button("Back"):
+            st.session_state.screen = "canvas"
+            st.rerun()
 
 # -----------------------------
 # Plus Button Screen
 # -----------------------------
 def plus_screen():
-    st.markdown("<h3>Plus Action Screen</h3>", unsafe_allow_html=True)
+    with st.container():  # vertical screen container
+        st.markdown("<h3>Plus Action Screen</h3>", unsafe_allow_html=True)
 
-    if st.button("Back"):
-        st.session_state.screen = "canvas"
-        st.rerun()
+        if st.button("Back"):
+            st.session_state.screen = "canvas"
+            st.rerun()
 
 # -----------------------------
 # Screen Router
